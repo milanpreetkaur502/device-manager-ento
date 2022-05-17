@@ -9,12 +9,12 @@ app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
 app.config['ENV']='development'
 
 def readData():
-    path="deviceStats.json"   #here define the path where the file is located, from which the data is to be read
+    path="/var/tmp/devicestats"  
     data=None
     with open(path ,'r') as file:
         data=json.load(file)
 
-    path="/home/attu/Downloads/"  #path for the bhagwat bhaiya's file
+    path="/tmp/" 
     data['temperature']=None
     with open(path+'met' ,'r') as file:
         data['temperature']=file.readlines()
@@ -47,11 +47,12 @@ def login():
 
 def gen_frames():  # generate frame by frame from camera
     
-    camera = cv2.VideoCapture(0)  # use 0 for web camera
+    camera = cv2.VideoCapture(2)  # use 0 for web camera
+    #camera = cv2.VideoCapture("v4l2src device=/dev/video2 ! video/x-raw, width=640, height=480 framerate=60/1, format=(string)UYVY ! decodebin ! videoconvert ! appsink", cv2.CAP_GSTREAMER)  # use 0 for web camera
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
     # for local webcam use cv2.VideoCapture(0)
     while True:
-        print("kuch toh")
+        #print("kuch toh")
         # Capture frame-by-frame
         success, frame = camera.read()  # read the camera frame
         if not success:
