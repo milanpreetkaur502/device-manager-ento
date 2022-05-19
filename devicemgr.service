@@ -1,0 +1,12 @@
+[Unit]
+Description=Device manager 
+
+[Service]
+ExecStart=/usr/bin/python3 -u /usr/sbin/device-manager/deviceManager/app.py
+Environment=PYTHONBUFFERED=1
+StandardOutput=file:/var/tmp/devicemgr.log
+StandardError=inherit
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
