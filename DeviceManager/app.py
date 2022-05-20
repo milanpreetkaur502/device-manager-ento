@@ -3,6 +3,7 @@ import json
 from flask import Flask, render_template, Response, redirect, request, session, url_for
 import cv2
 import time
+import subprocess
 
 app = Flask(__name__)
 app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
@@ -38,7 +39,7 @@ def login():
         email=request.form.get('email')
         password=request.form.get('pass')
         credentials=None
-        with open('credentials.json') as file:
+        with open('/usr/sbin/DeviceManager/credentials.json') as file:
             credentials=json.load(file)
         if credentials['email']==email and credentials['password']==password:
             session['username']=credentials['username']
@@ -47,6 +48,7 @@ def login():
 
 def gen_frames():  # generate frame by frame from camera
     
+    subprocess.call(["systemctl","stop","cam"])
     camera = cv2.VideoCapture(2)  # use 0 for web camera
     #camera = cv2.VideoCapture("v4l2src device=/dev/video2 ! video/x-raw, width=640, height=480 framerate=60/1, format=(string)UYVY ! decodebin ! videoconvert ! appsink", cv2.CAP_GSTREAMER)  # use 0 for web camera
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
