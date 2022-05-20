@@ -10,7 +10,7 @@ app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
 app.config['ENV']='development'
 
 def readData():
-    path="/var/tmp/devicestats"  
+    path="/tmp/devicestats"  
     data=None
     with open(path ,'r') as file:
         data=json.load(file)
