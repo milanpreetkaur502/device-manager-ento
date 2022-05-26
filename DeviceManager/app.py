@@ -28,7 +28,7 @@ def readData():
 
     data['light_intensity']=None
     with open(path+'light_intensity' ,'r') as file:
-        data['light_intensity']=file.readlines()[0].split(":")[1:]
+        data['light_intensity']=file.readlines()
 
     return data
 
