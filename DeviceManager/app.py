@@ -31,7 +31,7 @@ def readData():
 
     return data
 
-@app.route('/')  
+@app.route('/upd')  
 def upload():  
     return render_template("file_upload_form.html")  
  
