@@ -8,6 +8,7 @@ import subprocess
 app = Flask(__name__)
 app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
 app.config['ENV']='development'
+app.config['UPLOAD_FOLDER']='/media/mmcblk1p1'
 
 def readData():
     path="/tmp/devicestats"  
@@ -30,6 +31,17 @@ def readData():
 
     return data
 
+@app.route('/')  
+def upload():  
+    return render_template("file_upload_form.html")  
+ 
+@app.route('/success', methods = ['POST'])  
+def success():  
+    if request.method == 'POST':  
+        f = request.files['file']  
+        #f.save(f.filename)
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+        return render_template("success.html", name = f.filename)  
 
 @app.route('/',methods=["GET","POST"])
 def login():
