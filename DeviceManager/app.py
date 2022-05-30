@@ -52,7 +52,7 @@ def login():
         email=request.form.get('email')
         password=request.form.get('pass')
         credentials=None
-        with open('/usr/sbin/DeviceManager/credentials.json') as file:
+        with open('/usr/sbin/device-manager/DeviceManager/credentials.json') as file:
             credentials=json.load(file)
         if credentials['email']==email and credentials['password']==password:
             session['username']=credentials['username']
@@ -117,7 +117,7 @@ def logout():
 
 @app.route('/files')
 def files():
-    path="/home/attu/Downloads"  #path for the directory's of file
+    path="/media/mmcblk1p1/upload/"  #path for the directory's of file
     if not os.path.exists(path):
         return abort(404)
 
