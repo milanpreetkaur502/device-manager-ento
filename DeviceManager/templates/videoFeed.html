@@ -28,8 +28,8 @@
                     </a>
                 </li>
                 <li> 
-                    <a href="#">
-                        <i class="las la-chart-line"></i><span>Metrics</span>
+                    <a href="{{url_for('files')}}">
+                        <i class="las la-chart-line"></i><span>Download Files</span>
                     </a>
                 </li>
             </ul>
@@ -53,6 +53,9 @@
 
         <!-- Main section -->
         <main>
+            <div style="width:100%; padding:0 0 10px 0;text-align:center;">
+                Please restart the device after closing the device manager.
+            </div>
             <div class="video-feed-container">
                 <div class="cam">
                     <img src="{{url_for('videoFeed')}}" width="100%" height="100%" alt="">
