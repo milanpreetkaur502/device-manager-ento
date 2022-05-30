@@ -126,7 +126,7 @@ def files():
 
 @app.route('/files/<path:filename>', methods=['GET', 'POST'])
 def download(filename):
-    dir="/home/attu/Downloads/"+filename  #path for the directory's of file
+    dir="/media/mmcblk1p1/upload/"+filename  #path for the directory's of file
     # Returning file from appended path
     return send_file(dir)
 
