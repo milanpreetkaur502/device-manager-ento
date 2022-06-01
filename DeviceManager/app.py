@@ -30,6 +30,10 @@ def readData():
     data['light_intensity']=None
     with open(path+'light_intensity' ,'r') as file:
         data['light_intensity']=file.readlines()
+     
+    data['gps']=None
+    with open(path+'gps' , 'r') as file:
+        data['gps']=json.load(file)
 
     return data
 
@@ -108,7 +112,7 @@ def dashboard():
             "battery_parameters":{"Voltage":2.5,"Internal_temperature":38,"Average_current":2.7},
             "generalInfo":{"board_serial":34534,"board_type":"NRF","board_revision":2.3}
         }
-        return render_template('Dashboard.html',data=dummyData)#readData())
+        return render_template('Dashboard.html',data=readData())
     return redirect(url_for('login'))
 
 @app.route('/logout')
