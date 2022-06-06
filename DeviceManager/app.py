@@ -15,26 +15,34 @@ app.config['UPLOAD_FOLDER']='/media/mmcblk1p1'
 def readData():
     path="/tmp/devicestats"  
     data=None
-    with open(path ,'r') as file:
-        data=json.load(file)
+    try:
+        with open(path ,'r') as file:
+            data=json.load(file)
 
-    path="/tmp/" 
-    data['temperature']=None
-    with open(path+'met' ,'r') as file:
-        data['temperature']=file.readlines()
+        path="/tmp/" 
+        data['temperature']=None
+        with open(path+'met' ,'r') as file:
+            data['temperature']=file.readlines()
 
-    data['battery_parameters']=None
-    with open(path+'battery_parameters' ,'r') as file:
-        data['battery_parameters']=file.readlines()
+        data['battery_parameters']=None
+        with open(path+'battery_parameters' ,'r') as file:
+            data['battery_parameters']=file.readlines()
 
-    data['light_intensity']=None
-    with open(path+'light_intensity' ,'r') as file:
-        data['light_intensity']=file.readlines()
-     
-    data['gps']=None
-    with open(path+'gps' , 'r') as file:
-        data['gps']=json.load(file)
+        data['light_intensity']=None
+        with open(path+'light_intensity' ,'r') as file:
+            data['light_intensity']=file.readlines()
 
+        data['gps']=None
+        with open(path+'gps' , 'r') as file:
+            data['gps']=json.load(file)
+            
+    except FileNotFoundError:
+        data={"error":"File not found"}
+    except json.decoder.JSONDecodeError:
+        data={"error":"File is passed instead of json file"}
+    else:
+        data={"error":"Some error has been occured"}
+        
     return data
 
 @app.route('/upd')  
@@ -135,6 +143,24 @@ def download(filename):
     dir="/media/mmcblk1p1/upload/"+filename  #path for the directory's of file
     # Returning file from appended path
     return send_file(dir)
+
+@app.route('/configurations')
+def configurations():
+    return render_template('configurations.html')
+
+@app.route('/configurations/file', methods=['GET', 'POST'])
+def downloadConfFile():
+    dir="/home/attu/Downloads/met"  #defing the path for conf file
+    # Returning file from appended path
+    return send_file(dir)
+
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save(f.filename)  #path where the file has to be saved
+        return 'file uploaded successfully'
+    return 'Something went wrong'
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8000)
