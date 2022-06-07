@@ -150,7 +150,7 @@ def configurations():
 
 @app.route('/configurations/file', methods=['GET', 'POST'])
 def downloadConfFile():
-    dir="/home/attu/Downloads/met"  #defing the path for conf file
+    dir="/usr/sbin/rana/ranacore.conf"  #defing the path for conf file
     # Returning file from appended path
     return send_file(dir)
 
