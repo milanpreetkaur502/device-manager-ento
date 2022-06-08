@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
 app.config['ENV']='development'
 app.config['UPLOAD_FOLDER']='/media/mmcblk1p1'
+app.config['RANA_FOLDER']='/usr/sbin/rana'
 
 def readData():
     path="/tmp/devicestats"  
@@ -158,7 +159,8 @@ def downloadConfFile():
 def upload_file():
     if request.method == 'POST':
         f = request.files['file']
-        f.save(f.filename)  #path where the file has to be saved
+        #f.save(f.filename)  #path where the file has to be saved
+        f.save(os.path.join(app.config['RANA_FOLDER'], f.filename))
         return 'file uploaded successfully'
     return 'Something went wrong'
 
