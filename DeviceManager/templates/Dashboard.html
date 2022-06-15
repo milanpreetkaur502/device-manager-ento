@@ -49,7 +49,7 @@
                 <label for="nav-toggle"><i class="las la-bars"></i></label>
                 Dashboard
             </h1>
-            <h1 id="nameDisplay">Hi, Pratyush</h1>
+            <h1 id="nameDisplay">Hi, User</h1>
             <div>
                 <a href="{{url_for('logout')}}"><i class="las la-sign-out-alt" style="font-size: 36px;color:black"></i>
                     <p style="font-size: 11px;position:relative;top:-5px;color:black">logout</p>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <h1>{{data.light_intensity.Light_intensity}} Lux</h1>
+                        <h1>{{data.weather.lux}} Lux</h1>
                         <span>Light Intensity</span>    
                     </div>
                     <div>
@@ -129,8 +129,8 @@
                 </div>
                 <div class="card">
                     <div>
-                        <h4>Relative_humidity: {{data.temperature.Relative_humidity}} %</h4>
-                        <h4>Temperature(C): {{data.temperature.Temperature_c}} &#8451;</h4>
+                        <h4>Relative Humidity: {{data.weather.humidity}} %</h4>
+                        <h4>Temperature: {{data.weather.temperature}} &#8451;</h4>
                         <!-- <h4>Relative_humidity(F): {{data.temperature.Temperature_f}} &#8457;</h4> -->
                         <span>Weather</span>    
                     </div>
@@ -140,9 +140,9 @@
                 </div>
                 <div class="card">
                     <div>
-                        <h4>Voltage: {{data.battery_parameters.Voltage}} V</h4>
-                        <h4>Internal_temp(C): {{data.battery_parameters.Internal_temperature}} &#8451;</h4>
-                        <h4>Average_current: {{data.battery_parameters.Average_current}} mA</h4>
+                        <h4>Voltage: {{data.powerInfo.voltage}} V</h4>
+                        <h4>Internal Temprature: {{data.powerInfo.battery_temp}} &#8451;</h4>
+                        <h4>Average Current: {{data.powerInfo.current}} mA</h4>
                         <span>Battery</span>    
                     </div>
                     <div>
