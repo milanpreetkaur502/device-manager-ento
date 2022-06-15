@@ -41,8 +41,8 @@ def readData():
         data={"error":"File not found"}
     except json.decoder.JSONDecodeError:
         data={"error":"File is passed instead of json file"}
-    else:
-        data={"error":"Some error has been occured"}
+    except Exception as e:
+        data={"error":str(e)}
         
     return data
 
