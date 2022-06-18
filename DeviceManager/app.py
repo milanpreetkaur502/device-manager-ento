@@ -13,37 +13,58 @@ app.config['ENV']='development'
 app.config['UPLOAD_FOLDER']='/media/mmcblk1p1'
 app.config['RANA_FOLDER']='/usr/sbin/rana'
 
-def readData():
-    path="/tmp/devicestats"  
-    data=None
+def readFile(fileName):
+    path="/tmp/"+fileName
+    data={}
     try:
         with open(path ,'r') as file:
             data=json.load(file)
-
-        path="/tmp/" 
-        data['temperature']=None
-        with open(path+'met' ,'r') as file:
-            data['temperature']=file.readlines()
-
-        data['battery_parameters']=None
-        with open(path+'battery_parameters' ,'r') as file:
-            data['battery_parameters']=file.readlines()
-
-        data['light_intensity']=None
-        with open(path+'light_intensity' ,'r') as file:
-            data['light_intensity']=file.readlines()
-
-        data['gps']=None
-        with open(path+'gps' , 'r') as file:
-            data['gps']=json.load(file)
-            
     except FileNotFoundError:
         data={"error":"File not found"}
     except json.decoder.JSONDecodeError:
         data={"error":"File is passed instead of json file"}
     except Exception as e:
         data={"error":str(e)}
-        
+    return data
+
+def readData():
+    data={}
+    tmp=readFile("devicestats")
+    if "error" in tmp:
+        data={
+            "cpuInfo":{"usage":tmp["error"]},
+            "gpuInfo":{"memoryUsage":404},
+            "internet":{"connectivity":tmp["error"],"signal":tmp["error"]},
+            "ramInfo":{"total":tmp["error"],"usage":tmp["error"],"free":tmp["error"]},
+            "generalInfo":{"board_serial":tmp["error"],"board_type":"NRF","board_revision":tmp["error"]}
+        }
+    else:
+        data=tmp
+
+    tmp=readFile("met")
+    if "error" in tmp:
+        data['temperature']={"Relative_humidity":tmp["error"],"Temperature_c":tmp["error"],"Temperature_f":tmp["error"]}
+    else:
+        data['temperature']=tmp
+
+    tmp=readFile("battery_parameters")
+    if "error" in tmp:
+        data['battery_parameters']={"Voltage":tmp["error"],"Internal_temperature":tmp["error"],"Average_current":tmp["error"]}
+    else:
+        data['battery_parameters']=tmp
+
+    tmp=readFile("light_intensity")
+    if "error" in tmp:
+        data['light_intensity']={"Light_Intensity":tmp["error"]}
+    else:
+        data['light_intensity']=tmp
+
+    tmp=readFile("gps")
+    if "error" in tmp:
+        data['gps']={"location":{"longitude":tmp["error"],"latitude":tmp["error"],"altitude":tmp["error"]}}
+    else:
+        data['gps']=tmp
+                
     return data
 
 @app.route('/upd')  
@@ -75,7 +96,7 @@ def login():
 
 def gen_frames():  # generate frame by frame from camera
     
-    subprocess.call(["systemctl","stop","cam"])
+    subprocess.call(["systemctl","stop","rana"])
     camera = cv2.VideoCapture(2)  # use 0 for web camera
     camera.set(cv2.CAP_PROP_FPS,120)
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
