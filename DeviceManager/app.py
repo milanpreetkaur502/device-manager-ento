@@ -1,7 +1,8 @@
-from crypt import methods
+from itertools import count
 import json
 from multiprocessing import dummy
-from flask import Flask, render_template, Response, redirect, request, session, url_for, abort, send_file
+from urllib import response
+from flask import Flask, render_template, Response, redirect, request, session, url_for, abort, send_file, jsonify
 import cv2
 import time
 import os
@@ -12,6 +13,8 @@ app.config['SECRET_KEY']="asdadvadfsdfs"      #random secret key
 app.config['ENV']='development'
 app.config['UPLOAD_FOLDER']='/media/mmcblk1p1'
 app.config['RANA_FOLDER']='/usr/sbin/rana'
+app.config['RANA_CONFIG_PATH'] = '/usr/sbin/rana/ranacore.conf'
+app.config['credentials'] = '/usr/sbin/device-manager/DeviceManager/credentials.json'
 
 def readFile(fileName):
     path="/tmp/"+fileName
@@ -26,6 +29,19 @@ def readFile(fileName):
     except Exception as e:
         data={"error":str(e)}
     return data
+
+def readRanaConfigData():
+    temp=[]
+    with open(app.config['RANA_CONFIG_PATH'],'r') as file:
+        data=file.readlines()
+        for line in data:
+            if line[0]!='#' and line[0]!='\n':
+                ind=line.index(" ")
+                key=line[:ind]
+                value=line[ind+1:]
+                temp.append([key,value])
+    return temp
+        
 
 def readData():
     data={}
@@ -87,7 +103,7 @@ def login():
         email=request.form.get('email')
         password=request.form.get('pass')
         credentials=None
-        with open('/usr/sbin/device-manager/DeviceManager/credentials.json') as file:
+        with open(app.config['credentials']) as file:
             credentials=json.load(file)
         if credentials['email']==email and credentials['password']==password:
             session['username']=credentials['username']
@@ -95,10 +111,10 @@ def login():
     return render_template('login.html')
 
 def gen_frames():  # generate frame by frame from camera
-    
+
     subprocess.call(["systemctl","stop","rana"])
     camera = cv2.VideoCapture(2)  # use 0 for web camera
-    camera.set(cv2.CAP_PROP_FPS,120)
+    #camera.set(cv2.CAP_PROP_FPS,120)
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
     # for local webcam use cv2.VideoCapture(0)
     while True:
@@ -125,7 +141,39 @@ def videoFeed():
 @app.route('/video')
 def video(): 
     if 'username' in session:
-        return render_template('videoFeed.html')
+        data={}
+        try:
+            var = subprocess.check_output("v4l2-ctl --device /dev/video2 --list-ctrls".split())
+            output = var.decode('utf-8')
+            output = output.split('\n')
+            for index in range(len(output)-1):
+                output[index] = output[index].strip()
+                temp = output[index].split()
+                if '(int)' in temp:
+                    data[temp[0]]=[]
+                    data[temp[0]].append(temp[4].split('=')[-1])
+                    data[temp[0]].append(temp[5].split('=')[-1])
+                    data[temp[0]].append(temp[6].split('=')[-1])
+                    data[temp[0]].append(temp[7].split('=')[-1])
+                    data[temp[0]].append(temp[8].split('=')[-1])
+        except:
+            data["error"]="Something is wrong on v4l2"
+        return render_template('videoFeed.html',data=data)
+    return redirect(url_for('login'))
+
+@app.route('/setCamControls')
+def setCamControls():
+    if 'username' in session:
+        args = request.args
+        key = args.get('key')
+        value = args.get('value')
+        try:
+            subprocess.call(f"v4l2-ctl --device /dev/video2 --set-ctrl={key}={value}".split())
+            resp = {'msg':'success'}
+            return  jsonify(resp)
+        except:
+            resp = {'msg':'error'}
+            return  jsonify(resp)
     return redirect(url_for('login'))
 
 @app.route('/dashboard')
@@ -168,7 +216,31 @@ def download(filename):
 
 @app.route('/configurations')
 def configurations():
-    return render_template('configurations.html')
+    data=readRanaConfigData()
+    return render_template('configurations.html',data=data)
+
+@app.route('/saveRanaConfig',methods=['POST'])
+def saveRanaConfig():
+    if 'username' in session and request.method == 'POST':
+        formData=request.form
+        contentDict={}
+        content=None
+        with open(app.config['RANA_CONFIG_PATH'],'r') as file:
+            content=file.readlines()
+        count=0
+        for line in content:
+            if line[0]!='#' and line[0]!='\n':
+                ind=line.index(" ")
+                key=line[:ind]
+                value=formData[key]
+                contentDict[key]=(value,count)
+            count+=1
+        for key in contentDict:
+            line=key+" "+contentDict[key][0]+'\n'
+            content[contentDict[key][1]]=line
+        with open(app.config['RANA_CONFIG_PATH'],'w') as file:
+            file.writelines(content)
+    return redirect(url_for('configurations'))
 
 @app.route('/configurations/file', methods=['GET', 'POST'])
 def downloadConfFile():
