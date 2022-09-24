@@ -130,7 +130,7 @@
                 <div class="card">
                     <div>
                         <h4>Relative_humidity: {{data.weather.humidity}} %</h4>
-                        <h4>Temperature: {{data.weather.temperature}} &#8451</h4>
+                        <h4>Temperature(&#8451): {{data.weather.temperature}} &#8451</h4>
                         <span>Ambient</span>
                     </div>
                     <div>
