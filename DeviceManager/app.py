@@ -115,7 +115,9 @@ def gen_frames():  # generate frame by frame from camera
         time.sleep(1)
     #subprocess.call(["systemctl","stop","rana"])
     camera = cv2.VideoCapture(2)  # use 0 for web camera
-    #camera.set(cv2.CAP_PROP_FPS,120)
+    camera.set(cv2.CAP_PROP_FPS,120)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+    camera.set(cv2.CAP_PROP_HEIGTH,480)
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
     # for local webcam use cv2.VideoCapture(0)
     while True:
