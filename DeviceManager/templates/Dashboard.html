@@ -49,7 +49,7 @@
                 <label for="nav-toggle"><i class="las la-bars"></i></label>
                 Dashboard
             </h1>
-            <h1 id="nameDisplay">Hi, Pratyush</h1>
+            <h1 id="nameDisplay">Hi, User</h1>
             <div>
                 <a href="{{url_for('logout')}}"><i class="las la-sign-out-alt" style="font-size: 36px;color:black"></i>
                     <p style="font-size: 11px;position:relative;top:-5px;color:black">logout</p>
@@ -99,6 +99,8 @@
                     <div>
                         <h4>Connectivity : {{data.internet.connectivity}}</h4>
                         <h4>Signal : {{data.internet.signal}}</h4>
+                        <h4>Power : {{data.cellular.pow}}</h4>
+                        <h4>Technology : {{data.cellular.tech}}</h4>
                         <span>Internet</span>
                     </div>
                     <div>
@@ -150,7 +152,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <h4>Board-serial : {{data.generalInfo.board_serial}}</h4>
+                        <h4>Board-serial : {{data.job.device_id}}</h4>
                         <h4>Board-type : {{data.generalInfo.board_type}}</h4>
                         <h4>Board-revision : {{data.generalInfo.board_revision}}</h4>
                         <span>Device Info</span>    
@@ -159,6 +161,47 @@
                         <i class="las la-info-circle" style="font-size: 4rem;"></i>
                     </div>
                 </div>
+            
+	        <!-- -----Job Status and MMC Storage Stats-->
+		<div class="card">
+        	    <div>
+                        <h4>Status : {{data.job.job_status}}</h4>
+                        <h4>Serial-Id : {{data.job.job_id}}</h4>
+                        <h4>Start-Time : {{data.job.on_time}}</h4>
+                        <h4>End-Time : {{data.job.off_time}}</h4>
+                        <span>Job Activity</span>    
+                    </div>
+                <div>
+                        <i class="las la-hourglass-half" style="font-size: 4rem;"></i>
+                </div>
+                    </div>
+ 
+               <div class="card">
+                    <div>
+                        <h4>Total : {{data.storage.total}}</h4>
+                        <h4>Used : {{data.storage.used}}</h4>
+                        <h4>Free : {{data.storage.available}}</h4>
+                        <h4>Video-Files : {{data.storage.files}}</h4>
+                        <span>Storage</span>    
+                    </div>
+                    <div>
+                        <i class="las la-sd-card" style="font-size: 4rem;"></i>
+                    </div>
+                </div>
+		<div class="card">
+                    <div>
+                        <h4>Operator : {{data.cellular.operator}}</h4>
+                        <h4>ID : {{data.cellular.op_id}}</h4>
+                        <h4>IMEI : {{data.cellular.imei}}</h4>
+                        <h4>Registration : {{data.cellular.reg}}</h4>
+                        <h4>APN : {{data.cellular.apn}}</h4>
+                        <span>Network Provider</span>
+                    </div>
+                    <div>
+                        <i class="las la-sim-card" style="font-size:4rem;"></i>
+                    </div>
+                </div>
+
             </div>
             {%endif%}
 

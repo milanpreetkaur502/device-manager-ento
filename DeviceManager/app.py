@@ -44,6 +44,16 @@ def readRanaConfigData():
         
 
 def readData():
+    subprocess.call("/usr/sbin/device-manager/DeviceManager/job_data.sh")
+    time.sleep(0.05)
+
+    subprocess.call("/usr/sbin/device-manager/DeviceManager/cellular.sh")
+    time.sleep(0.05)
+
+    subprocess.call("/usr/sbin/device-manager/DeviceManager/storage_state.sh")
+    time.sleep(0.05)
+
+
     data={}
     tmp=readFile("devicestats")
     if "error" in tmp:
@@ -80,8 +90,45 @@ def readData():
         data['gps']={"location":{"longitude":tmp["error"],"latitude":tmp["error"],"altitude":tmp["error"]}}
     else:
         data['gps']=tmp
+
+    tmp=readFile("job")
+    #print(tmp)
+    if "error" in tmp:
+        data['job']={"status":tmp["error"],"id":tmp["error"],"start_time":tmp["error"],"end_time":tmp["error"]}
+    else:
+        data['job']=tmp
+        #print(data['job'])
+                
+    tmp=readFile("storage")
+    #print(tmp)
+    if "error" in tmp:
+        data['storage']={"total":tmp["error"],"used":tmp["error"],"free":tmp["error"],"file":tmp["error"]}
+    else:
+        data['storage']=tmp
+
+
+    tmp=readFile("cellular")
+    #print(tmp)
+    if "error" in tmp:
+        data['cellular']={"operator":tmp["error"],"strength":tmp["error"],"state":tmp["error"],"pow":tmp["error"],"reg":tmp["error"],"tech":tmp["error"],"op_id":tmp["error"],"imei":tmp["error"],"apn":tmp["error"]}
+    else:
+        data['cellular']=tmp
+
                 
     return data
+
+# update camera controls
+def updateData(keyValue):
+        data={}
+        path="/etc/entomologist/"
+        with open(path + "camera_control.json",'r') as file:
+            data=json.load(file)
+        with open(path + "camera_control.json",'w') as file:
+            data.update(keyValue)
+            #data.update({name:dataa})
+            json.dump(data,file,indent=4,separators=(',', ': '))
+
+
 
 @app.route('/upd')  
 def upload():  
@@ -111,13 +158,24 @@ def login():
     return render_template('login.html')
 
 def gen_frames():  # generate frame by frame from camera
+    camera = cv2.VideoCapture("/usr/sbin/device-manager/DeviceManager/render.mp4")  # use 0 for web camera
+    #camera.set(cv2.CAP_PROP_FPS,120)
     while os.path.exists('/tmp/rana_active'):
-        time.sleep(1)
+        time.sleep(0.05)
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+    camera.release()
     #subprocess.call(["systemctl","stop","rana"])
     camera = cv2.VideoCapture(2)  # use 0 for web camera
-    camera.set(cv2.CAP_PROP_FPS,120)
+    camera.set(cv2.CAP_PROP_FPS,60)
     camera.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-    camera.set(cv2.CAP_PROP_HEIGTH,480)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
     #  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
     # for local webcam use cv2.VideoCapture(0)
     while True:
@@ -172,6 +230,7 @@ def setCamControls():
         value = args.get('value')
         try:
             subprocess.call(f"v4l2-ctl --device /dev/video2 --set-ctrl={key}={value}".split())
+            updateData({key:value})
             resp = {'msg':'success'}
             return  jsonify(resp)
         except:
