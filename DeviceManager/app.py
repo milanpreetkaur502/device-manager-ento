@@ -114,16 +114,20 @@ def readData():
     else:
         data['cellular']=tmp
 
+    #dbg=subprocess.call(["cat","/tmp/debug_modem"])
+    dbg=subprocess.Popen(["cat","/tmp/debug_modem"],stdout=subprocess.PIPE)    
+    dbg=dbg.stdout.readlines()
                 
-    return data
+    print(dbg)      
+    return data,dbg
 
 # update camera controls
 def updateData(keyValue):
         data={}
         path="/etc/entomologist/"
-        with open(path + "camera_control.json",'r') as file:
+        with open(path + "camera_control.conf",'r') as file:
             data=json.load(file)
-        with open(path + "camera_control.json",'w') as file:
+        with open(path + "camera_control.conf",'w') as file:
             data.update(keyValue)
             #data.update({name:dataa})
             json.dump(data,file,indent=4,separators=(',', ': '))
@@ -252,7 +256,9 @@ def dashboard():
             "battery_parameters":{"Voltage":2.5,"Internal_temperature":38,"Average_current":2.7},
             "generalInfo":{"board_serial":34534,"board_type":"NRF","board_revision":2.3}
         }
-        return render_template('Dashboard.html',data=readData())
+        dat,db=readData()
+        print(db)
+        return render_template('Dashboard.html',data=dat,dbg=db)
     return redirect(url_for('login'))
 
 @app.route('/logout')
